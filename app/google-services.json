@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "448832511103",
+    "project_id": "mobile-life-health",
+    "storage_bucket": "mobile-life-health.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:448832511103:android:4f67c6fdd15271ef6eb34a",
+        "android_client_info": {
+          "package_name": "br.com.fiap.lifehealth"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAulJrSx61jqAVA4ATscFVsAQcOSgwR_Oo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
