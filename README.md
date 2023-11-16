@@ -15,14 +15,13 @@
 * [5. Desenvolvedores](#5-desenvolvedores)
 
 ## 1. Sobre
-A <b>[Life Health](https://life-health.vercel.app/)</b> é uma plataforma  de gerenciamento da saúde e bem estar. Desenvolvido para o curso de graduação de Sistemas para Internet da FIAP. </br></br>
+A <b>[Life Health]()</b> é uma plataforma  de gerenciamento da saúde e bem estar. Desenvolvido para o curso de graduação de Sistemas para Internet da FIAP. </br></br>
 A plataforma tem como objetivo realizar o monitoramento e controle da saúde do usuario por meio dos dados fornecido, ajudando e apontando melhorias, com a opção de habilitar para um médico poder ter acesso e poder tambem realizar o monitoramento e controle de seu paciente com sua previa autorização, auxiliando assim no bem estar. </br></br>
 O App possibilita tambem o profissional da saude alem de ver como anda seu paciente, verificar e alertar de possivel risco e orientar ou direcionar para um a tendimento ou pronto atendimento, assim como o paciente pode deixar um alerta sobre poossiveis complicações que possa estar tendo para o médico poder acessar e orienta-lo da melhor forma. </br></br>
 
 <div align="center">
-  <a href="https://life-health.vercel.app/">
-    <img width="50% alt="tela de login" src="https://github.com/matheus-poro/life-health/assets/37550557/37f4f9cb-30ee-40b1-843f-985241b7e5cf">
-    <img width="40% alt="dashboard" src="https://github.com/matheus-poro/life-health/assets/37550557/4f30aa01-991f-425a-879e-894df4a4ad80">
+  <a href="">
+    <img width="655" alt="App LifeHealth mobile" src="https://github.com/luciana-pereira/life-health-mobile/assets/37550557/45c92afa-4a05-4b8a-97d7-29dbd825abee">
   </a>
 </div>
 
@@ -37,8 +36,8 @@ O projeto foi desenvolvido utilizando protótipo realizado no Figma conforme ima
 
 ## 4. Tecnologias e Ferramentas externas utilizadas
 
-### FHI Server
-A ferramenta externa [FHIR Server](https://github.com/microsoft/fhir-server) * foi utilizada, com o bjetivo de padronizar, auxiliar e facilitar o uso dos dados de saude para o monitoramento e gestão da saude e bem estar dos nossos usuarios com sua previa autorização.
+### Android FHIR SDK
+Utilizamos a biblioteca [Android FHIR SDK](https://github.com/google/android-fhir) * foi utilizada, com o bjetivo de padronizar, auxiliar e facilitar o uso dos dados de saude para o monitoramento e gestão da saude e bem estar dos nossos usuarios com sua previa autorização.
 
 ### Firebase
 Está ferramento foi utilizada para autenticação de usuários, embora o Firebase não ofereça suporte direto ao FHIR Server, usamos o Firebase como um serviço de backend para o aplicativo e integrá-lo com um FHIR Server para armazenamento e recuperação de dados de saúde.</br></br>
