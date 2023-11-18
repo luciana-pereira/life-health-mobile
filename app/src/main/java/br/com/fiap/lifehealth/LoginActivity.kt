@@ -3,6 +3,7 @@ package br.com.fiap.lifehealth
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -33,6 +34,11 @@ class LoginActivity : AppCompatActivity() {
             val email = emailLogin.text.toString()
             val password = passwordLogin.text.toString()
             loginUser(email, password)
+        }
+
+        fun startRegisterActivity(view: View) {
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
         }
 
     }
