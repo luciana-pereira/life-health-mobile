@@ -30,7 +30,7 @@
         </activity>
         <activity
             android:name=".RegisterActivity"
-            android:theme="@style/Theme.AppCompat"
+            android:theme="@style/AppTheme"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

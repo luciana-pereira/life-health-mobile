@@ -6,4 +6,14 @@
         <item name="colorPrimaryDark">#2980b9</item>
         <item name="colorAccent">#ffffff</item>
     </style>
+
+    <style name="RoundedButton">
+        <item name="android:background">@drawable/rounded_button</item>
+        <item name="android:textColor">#FFF</item>
+        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:padding">12dp</item>
+    </style>
+
 </resources>

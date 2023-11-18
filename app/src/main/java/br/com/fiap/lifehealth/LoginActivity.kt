@@ -1,11 +1,12 @@
 package br.com.fiap.lifehealth
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -17,7 +18,16 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var passwordLogin: EditText
     private lateinit var buttonLogin: Button
     private lateinit var auth: FirebaseAuth
+    private lateinit var linkRegister: TextView
+    private lateinit var presentationText: TextView
 
+    private lateinit var buttonDecrease: Button
+    private lateinit var buttonIncrease: Button
+    private var textSize = 20f
+    private val textSizeStep = 2f
+
+
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.AppTheme)
@@ -36,9 +46,26 @@ class LoginActivity : AppCompatActivity() {
             loginUser(email, password)
         }
 
-        fun startRegisterActivity(view: View) {
+        linkRegister = findViewById(R.id.linkRegister)
+
+        linkRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
+        }
+
+
+        presentationText = findViewById(R.id.presentationText)
+        buttonIncrease = findViewById(R.id.buttonIncreaseTextSize)
+        buttonDecrease = findViewById(R.id.buttonDecreaseTextSize)
+
+        buttonIncrease.setOnClickListener {
+            textSize += textSizeStep
+            adjustTextSize()
+        }
+
+        buttonDecrease.setOnClickListener {
+            textSize -= textSizeStep
+            adjustTextSize()
         }
 
     }
@@ -48,7 +75,7 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) {
                 task ->
                 if (task.isSuccessful) {
-                    val user = auth.currentUser
+                    //val user = auth.currentUser
                     val intent = Intent(this, DashboardActivity::class.java)
                     startActivity(intent)
                 } else {
@@ -56,4 +83,20 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
     }
+
+    private fun adjustTextSize() {
+        if (textSize in 20f..28f) {
+            presentationText.textSize = textSize
+            emailLogin.textSize = textSize
+            passwordLogin.textSize = textSize
+            buttonLogin.textSize = textSize
+            linkRegister.textSize = textSize
+            // buttonIncrease.textSize = textSize
+            // buttonDecrease.textSize = textSize
+        } else {
+            Toast.makeText(baseContext, "Opa! Este e o limite maximo para aumentar/diminuir  o tamanho da letra para visualização.", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
 }

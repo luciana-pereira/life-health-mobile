@@ -1,5 +1,6 @@
 package br.com.fiap.lifehealth
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -19,7 +20,9 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var emailRegister: EditText
     private lateinit var passwordRegister: EditText
     private lateinit var buttonRegister: Button
+    private lateinit var linkLogin: TextView
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
@@ -42,6 +45,13 @@ class RegisterActivity : AppCompatActivity() {
             val email = emailRegister.text.toString()
             val password = passwordRegister.text.toString()
             registerUser(email, password)
+        }
+
+        linkLogin = findViewById(R.id.linkLogin)
+
+        linkLogin.setOnClickListener {
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
         }
     }
 

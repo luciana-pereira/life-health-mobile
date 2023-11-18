@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Life Health</string>
+    <string name="email_hint">Digite seu e-mail</string>
+    <string name="password_hint">Digite sua senha</string>
+    <string name="button_decrease_text_size">Diminuir Tamanho do Texto</string>
+    <string name="button_increase_text_size">Aumentar Tamanho do Texto</string>
+    <string name="presentation_text">"Ajudamos você a cuidar do seu bem mais precioso, a sua saúde."</string>
+    <string name="logo_description">Logo do Life Health, que consiste em um circulo com bordas grossas em azul e preenchido com a cor branca em seu interior</string>
+    <string name="login_button_description">Clique neste botão para fazer login com seu email e senha</string>
+    <string name="register_link_description">Clique neste link para se cadastrar, caso ainda não possua conta no aplicativo</string>
 </resources>
