@@ -8,4 +8,8 @@
     <string name="logo_description">Logo do Life Health, que consiste em um circulo com bordas grossas em azul e preenchido com a cor branca em seu interior</string>
     <string name="login_button_description">Clique neste botão para fazer login com seu email e senha</string>
     <string name="register_link_description">Clique neste link para se cadastrar, caso ainda não possua conta no aplicativo</string>
+    <string name="user_types_text">Selecione uma das opções abaixo, para realizar o cadastro.</string>
+    <string name="privacy_policy_text">Ao se cadastrar você concorda com a nossa <b>política de privacidade</b>.</string>
+    <string name="link_login">Já possui uma conta? <b>Faça login</b></string>
+    <string name="link_register">Ainda não tem conta? Cadastre-se</string>
 </resources>

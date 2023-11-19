@@ -1,13 +1,12 @@
 package br.com.fiap.lifehealth
 
-import android.annotation.SuppressLint
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -20,44 +19,54 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var linkRegister: TextView
     private lateinit var presentationText: TextView
-
     private lateinit var buttonDecrease: Button
     private lateinit var buttonIncrease: Button
     private var textSize = 20f
     private val textSizeStep = 2f
 
-
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.AppTheme)
         setContentView(R.layout.activity_login)
 
-        //Firebase Auth
-        auth = Firebase.auth
+        initializeViews()
+        setupFirebase()
+        setupLoginButton()
+        setupRegisterLink()
+        setupTextSizeControls()
+    }
 
+    private fun initializeViews() {
+        auth = Firebase.auth
         emailLogin = findViewById(R.id.emailLogin)
         passwordLogin = findViewById(R.id.passwordLogin)
         buttonLogin = findViewById(R.id.buttonLogin)
+        linkRegister = findViewById(R.id.linkRegister)
+        presentationText = findViewById(R.id.presentationText)
+        buttonIncrease = findViewById(R.id.buttonIncreaseTextSize)
+        buttonDecrease = findViewById(R.id.buttonDecreaseTextSize)
+    }
 
+    private fun setupFirebase() {
+        auth = Firebase.auth
+    }
+
+    private fun setupLoginButton() {
         buttonLogin.setOnClickListener {
             val email = emailLogin.text.toString()
             val password = passwordLogin.text.toString()
             loginUser(email, password)
         }
+    }
 
-        linkRegister = findViewById(R.id.linkRegister)
-
+    private fun setupRegisterLink() {
         linkRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
+    }
 
-
-        presentationText = findViewById(R.id.presentationText)
-        buttonIncrease = findViewById(R.id.buttonIncreaseTextSize)
-        buttonDecrease = findViewById(R.id.buttonDecreaseTextSize)
-
+    private fun setupTextSizeControls() {
         buttonIncrease.setOnClickListener {
             textSize += textSizeStep
             adjustTextSize()
@@ -67,19 +76,15 @@ class LoginActivity : AppCompatActivity() {
             textSize -= textSizeStep
             adjustTextSize()
         }
-
     }
 
     private fun loginUser(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) {
-                task ->
+            .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    //val user = auth.currentUser
-                    val intent = Intent(this, DashboardActivity::class.java)
-                    startActivity(intent)
+                    navigateToDashboard()
                 } else {
-                    Toast.makeText(baseContext, "E-mail ou senha incorreto!", Toast.LENGTH_SHORT).show()
+                    showLoginError()
                 }
             }
     }
@@ -91,12 +96,21 @@ class LoginActivity : AppCompatActivity() {
             passwordLogin.textSize = textSize
             buttonLogin.textSize = textSize
             linkRegister.textSize = textSize
-            // buttonIncrease.textSize = textSize
-            // buttonDecrease.textSize = textSize
         } else {
-            Toast.makeText(baseContext, "Opa! Este e o limite maximo para aumentar/diminuir  o tamanho da letra para visualização.", Toast.LENGTH_SHORT).show()
+            showTextSizeLimitError()
         }
-
     }
 
+    private fun navigateToDashboard() {
+        val intent = Intent(this, DashboardActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun showLoginError() {
+        Toast.makeText(baseContext, "E-mail ou senha incorreto!", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showTextSizeLimitError() {
+        Toast.makeText(baseContext, "Opa! Este é o limite máximo para aumentar/diminuir o tamanho da letra para visualização.", Toast.LENGTH_SHORT).show()
+    }
 }

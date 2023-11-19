@@ -122,7 +122,7 @@
         android:clickable="true"
         android:contentDescription="@string/register_link_description"
         android:focusable="true"
-        android:text="Ainda não tem conta? Cadastre-se"
+        android:text="@string/link_register"
         android:textAlignment="center"
         android:textColor="#ADACAD"
         app:layout_constraintEnd_toEndOf="parent"
