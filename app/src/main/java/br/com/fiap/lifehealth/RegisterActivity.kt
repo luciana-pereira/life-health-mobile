@@ -1,24 +1,33 @@
 package br.com.fiap.lifehealth
 
-import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.ContentValues.TAG
 import android.content.Intent
-import android.os.Build
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.*
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.Firebase
+import androidx.core.graphics.drawable.toBitmap
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import java.io.ByteArrayOutputStream
+import java.util.UUID
 
 class RegisterActivity : AppCompatActivity() {
-    private lateinit var spinnerSpecialty: Spinner
     private lateinit var auth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
+    private lateinit var storage: FirebaseStorage
+    private lateinit var spinnerSpecialty: Spinner
     private lateinit var emailRegister: EditText
     private lateinit var passwordRegister: EditText
     private lateinit var buttonRegister: Button
@@ -34,20 +43,141 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var radioButtonMale: RadioButton
     private lateinit var checkBoxPrivacyPolicy: CheckBox
     private lateinit var dateOfBirth: EditText
+    private lateinit var storageReference: StorageReference
+    private lateinit var imageView: ImageView
+    private lateinit var imageUrl: String
+    private val PICK_IMAGE_REQUEST = 1
+    private var filePath: Uri? = null
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+
+        storageReference = FirebaseStorage.getInstance().reference
+        imageView = findViewById(R.id.imageView)
+
+        auth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
+
+        val buttonChooseImage: Button = findViewById(R.id.buttonChooseImage)
+        buttonChooseImage.setOnClickListener {
+            showFileChooser()
+        }
 
         initializeComponents()
         setupSpinner()
         setupTextWatchers()
         setupListeners()
-        setupFirebase()
         disableButton()
         validateFields()
+    }
+
+    private fun showFileChooser() {
+        val intent = Intent()
+        intent.type = "image/*"
+        intent.action = Intent.ACTION_GET_CONTENT
+        startActivityForResult(Intent.createChooser(intent, "Escolha uma imagem"), PICK_IMAGE_REQUEST)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.data != null) {
+            var filePath = data.data
+            try {
+                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, filePath)
+                imageView.setImageBitmap(bitmap)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun uploadImage() {
+        if (filePath != null) {
+            val ref: StorageReference = storageReference.child("images/" + UUID.randomUUID().toString())
+            val stream = ByteArrayOutputStream()
+            val bitmap = (imageView.drawable).toBitmap()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+            val byteArray = stream.toByteArray()
+
+            ref.putBytes(byteArray)
+                .addOnSuccessListener { task ->
+                    ref.downloadUrl
+                        .addOnSuccessListener { downloadUri ->
+                            val downloadUrl = downloadUri.toString()
+                            saveDataToFirestore(downloadUrl)
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(
+                                this,
+                                "Erro ao obter URL de download: ${e.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            e.printStackTrace()
+                        }
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        this,
+                        "Erro no upload da imagem: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    e.printStackTrace()
+                }
+        }
+    }
+
+    private fun saveDataToFirestore(imageUrl: String) {
+        val user = if (radioButtonPatient.isChecked) {
+            hashMapOf(
+                "type" to "Patient",
+                "imageUrl" to imageUrl,
+                "name" to userName.text.toString(),
+                "surname" to surname.text.toString(),
+                "email" to emailRegister.text.toString(),
+                "password" to passwordRegister.text.toString(),
+                "gender" to if (radioButtonFemale.isChecked) "Feminino" else "Masculino",
+                "dateOfBirth" to dateOfBirth.text.toString()
+            )
+        } else {
+            hashMapOf(
+                "type" to "Doctor",
+                "imageUrl" to imageUrl,
+                "name" to userName.text.toString(),
+                "surname" to surname.text.toString(),
+                "email" to emailRegister.text.toString(),
+                "password" to passwordRegister.text.toString(),
+                "MedicalSpecialty" to textMedicalSpecialty.text.toString(),
+                "CRM" to editTextCRM.text.toString(),
+                "gender" to if (radioButtonFemale.isChecked) "Feminino" else "Masculino",
+                "dateOfBirth" to dateOfBirth.text.toString()
+            )
+        }
+
+        val collection = if (radioButtonPatient.isChecked) "patient" else "doctor"
+        val userId = auth.currentUser?.uid
+
+        if (userId != null) {
+            firestore.collection(collection).document(userId)
+                .set(user)
+                .addOnSuccessListener {
+                    Log.d(TAG, "DocumentSnapshot added")
+                    Toast.makeText(
+                        this,
+                        "Cadastro realizado com sucesso!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "Error adding document", e)
+                    Toast.makeText(
+                        this,
+                        "Erro ao realizar cadastro: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+        }
     }
 
     private fun initializeComponents() {
@@ -70,20 +200,35 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setupSpinner() {
-        val specialties = listOf("Cardiologia Geral", "Clínica Médica Geral", "Gastroenterologia Geral", "Ginecologia Clínica", "Pediatria Geral", "Pneumologia Geral", "Dermatologia Geral", "Ortopedia Geral")
+        val specialties = listOf(
+            "Cardiologia Geral",
+            "Clínica Médica Geral",
+            "Gastroenterologia Geral",
+            "Ginecologia Clínica",
+            "Pediatria Geral",
+            "Pneumologia Geral",
+            "Dermatologia Geral",
+            "Ortopedia Geral"
+        )
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, specialties)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerSpecialty.adapter = adapter
 
         spinnerSpecialty.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            @RequiresApi(Build.VERSION_CODES.O)
-            override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parentView: AdapterView<*>,
+                selectedItemView: View?,
+                position: Int,
+                id: Long
+            ) {
                 validateFields()
             }
 
             override fun onNothingSelected(parentView: AdapterView<*>) {
-                Toast.makeText(baseContext, "Selecione sua especialidade médica, para concluir o cadastro.",
-                    Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    baseContext, "Selecione sua especialidade médica, para concluir o cadastro.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -94,7 +239,6 @@ class RegisterActivity : AppCompatActivity() {
         editTextCRM.addTextChangedListener(watcher)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun setupListeners() {
         radioButtonPatient.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -113,6 +257,7 @@ class RegisterActivity : AppCompatActivity() {
         buttonRegister.setOnClickListener {
             val email = emailRegister.text.toString()
             val password = passwordRegister.text.toString()
+            uploadImage()
             registerUser(email, password)
         }
 
@@ -120,10 +265,6 @@ class RegisterActivity : AppCompatActivity() {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
-    }
-
-    private fun setupFirebase() {
-        auth = FirebaseAuth.getInstance()
     }
 
     private fun disableButton() {
@@ -142,59 +283,40 @@ class RegisterActivity : AppCompatActivity() {
         textMedicalSpecialty.visibility = View.GONE
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun validateFields() {
         val isPatientSelected = radioButtonPatient.isChecked
         val isDoctorSelected = radioButtonDoctor.isChecked
         val isEmailValid = emailRegister.text.isNotEmpty()
         val isPasswordValid = passwordRegister.text.isNotEmpty()
         val isPasswordValidContent = passwordRegister.text.toString()
-        val isSpinnerItemSelected = if (isDoctorSelected) spinnerSpecialty.selectedItemPosition != AdapterView.INVALID_POSITION else true
+        val isSpinnerItemSelected =
+            if (isDoctorSelected) spinnerSpecialty.selectedItemPosition != AdapterView.INVALID_POSITION else true
         val isCRMValid = if (isDoctorSelected) editTextCRM.text.isNotEmpty() else true
         val isUserName = userName.text.isNotEmpty()
         val isSurname = surname.text.isNotEmpty()
         val isFemale = radioButtonFemale.isChecked
         val isMale = radioButtonMale.isChecked
-        val currentDate = LocalDate.now()
-        val isDateOfBirthText = dateOfBirth.text.toString()
-        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-        val isDateOfBirthDate = LocalDate.parse(isDateOfBirthText, formatter)
+        val isDateOfBirthDate = dateOfBirth.text.isNotEmpty()
         val isPrivacyPolicy = checkBoxPrivacyPolicy.isChecked
 
-        if (isPatientSelected) {
-            if (
-                isUserName &&
-                isSurname &&
-                isEmailValid &&
-                (isPasswordValid && isPasswordValidContent.length >= 6) &&
-                (isFemale || isMale) &&
-                (isDateOfBirthDate.isEqual(currentDate)) &&
-                isPrivacyPolicy
-            ) {
-                buttonRegister.isEnabled = true
-                buttonRegister.backgroundTintList = resources.getColorStateList(R.color.colorEnabledButton)
-            } else {
-                buttonRegister.isEnabled = false
-                buttonRegister.backgroundTintList = resources.getColorStateList(R.color.colorDisabledButton)
-            }
+        if (!isDoctorSelected) {
+            buttonRegister.isEnabled = isUserName &&
+                    isSurname &&
+                    isEmailValid &&
+                    (isPasswordValid && isPasswordValidContent.length >= 6) &&
+                    (isFemale || isMale) &&
+                    isDateOfBirthDate &&
+                    isPrivacyPolicy
         } else {
-            if (
-                isUserName &&
-                isSurname &&
-                isEmailValid &&
-                (isPasswordValid && isPasswordValidContent.length >= 6) &&
-                isSpinnerItemSelected &&
-                isCRMValid &&
-                (isFemale || isMale) &&
-                (isDateOfBirthDate.isEqual(currentDate)) &&
-                isPrivacyPolicy
-            ) {
-                buttonRegister.isEnabled = true
-                buttonRegister.backgroundTintList = resources.getColorStateList(R.color.colorEnabledButton)
-            } else {
-                buttonRegister.isEnabled = false
-                buttonRegister.backgroundTintList = resources.getColorStateList(R.color.colorDisabledButton)
-            }
+            buttonRegister.isEnabled = isUserName &&
+                    isSurname &&
+                    isEmailValid &&
+                    (isPasswordValid && isPasswordValidContent.length >= 6) &&
+                    isSpinnerItemSelected &&
+                    isCRMValid &&
+                    (isFemale || isMale) &&
+                    isDateOfBirthDate &&
+                    isPrivacyPolicy
         }
     }
 
@@ -203,7 +325,6 @@ class RegisterActivity : AppCompatActivity() {
 
         override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
 
-        @RequiresApi(Build.VERSION_CODES.O)
         override fun afterTextChanged(editable: Editable) {
             validateFields()
         }
@@ -213,12 +334,64 @@ class RegisterActivity : AppCompatActivity() {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    val user = auth.currentUser
+                    val userId = auth.currentUser?.uid
+                    if (userId != null) {
+                        val user = if (radioButtonPatient.isChecked) {
+                            hashMapOf(
+                                "type" to "Patient",
+                                "imageUrl" to "",
+                                "name" to userName.text.toString(),
+                                "surname" to surname.text.toString(),
+                                "email" to emailRegister.text.toString(),
+                                "password" to passwordRegister.text.toString(),
+                                "gender" to if (radioButtonFemale.isChecked) "Feminino" else "Masculino",
+                                "dateOfBirth" to dateOfBirth.text.toString()
+                            )
+                        } else {
+                            hashMapOf(
+                                "type" to "Doctor",
+                                "imageUrl" to "",
+                                "name" to userName.text.toString(),
+                                "surname" to surname.text.toString(),
+                                "email" to emailRegister.text.toString(),
+                                "password" to passwordRegister.text.toString(),
+                                "MedicalSpecialty" to textMedicalSpecialty.text.toString(),
+                                "CRM" to editTextCRM.text.toString(),
+                                "gender" to if (radioButtonFemale.isChecked) "Feminino" else "Masculino",
+                                "dateOfBirth" to dateOfBirth.text.toString()
+                            )
+                        }
+
+                        val collection = if (radioButtonPatient.isChecked) "patient" else "doctor"
+
+                        firestore.collection(collection).document(userId)
+                            .set(user)
+                            .addOnSuccessListener {
+                                Log.d(TAG, "DocumentSnapshot added")
+                                Toast.makeText(
+                                    this,
+                                    "Cadastro realizado com sucesso!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            .addOnFailureListener { e ->
+                                Log.w(TAG, "Error adding document", e)
+                                Toast.makeText(
+                                    this,
+                                    "Erro ao realizar cadastro: ${e.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                    } else {
+                        Log.e("SignUpActivity", "Erro ao criar usuário: ${task.exception?.message}")
+                    }
                     val intent = Intent(this, DashboardActivity::class.java)
                     startActivity(intent)
                 } else {
-                    Toast.makeText(baseContext, "Algo deu errado na criação da conta, tente novamente.",
-                        Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        baseContext, "Erro ao criar usuário: ${task.exception?.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
     }

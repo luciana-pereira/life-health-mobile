@@ -12,4 +12,22 @@
     <string name="privacy_policy_text">Ao se cadastrar você concorda com a nossa <b>política de privacidade</b>.</string>
     <string name="link_login">Já possui uma conta? <b>Faça login</b></string>
     <string name="link_register">Ainda não tem conta? Cadastre-se</string>
+    <string name="login">Login</string>
+    <string name="a">A-</string>
+    <string name="b">A+</string>
+    <string name="inserir_foto">Inserir foto</string>
+    <string name="cadastrar">Cadastrar</string>
+    <string name="selecione_o_sexo_biol_gico">Selecione o sexo biológico?</string>
+    <string name="crm">CRM</string>
+    <string name="nome">Nome</string>
+    <string name="data_de_nascimento">Data de nascimento</string>
+    <string name="sobrenome">Sobrenome</string>
+    <string name="e_mail">E-mail</string>
+    <string name="todo">TODO</string>
+    <string name="senha">Senha</string>
+    <string name="m_dico">Médico</string>
+    <string name="feminino">Feminino</string>
+    <string name="masculino">Masculino</string>
+    <string name="paciente">Paciente</string>
+    <string name="especialidade_m_dica">Especialidade Médica</string>
 </resources>
