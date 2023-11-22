@@ -18,8 +18,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.io.ByteArrayOutputStream
 import java.util.UUID
 
@@ -385,7 +383,7 @@ class RegisterActivity : AppCompatActivity() {
                     } else {
                         Log.e("SignUpActivity", "Erro ao criar usuário: ${task.exception?.message}")
                     }
-                    val intent = Intent(this, DashboardActivity::class.java)
+                    val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)
                 } else {
                     Toast.makeText(
