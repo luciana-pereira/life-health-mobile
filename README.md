@@ -36,8 +36,8 @@ O projeto foi desenvolvido utilizando protótipo realizado no Figma conforme ima
 
 ## 4. Tecnologias e Ferramentas externas utilizadas
 
-### Android FHIR SDK
-Utilizamos a biblioteca [Android FHIR SDK](https://github.com/google/android-fhir) * foi utilizada, com o bjetivo de padronizar, auxiliar e facilitar o uso dos dados de saude para o monitoramento e gestão da saude e bem estar dos nossos usuarios com sua previa autorização.
+### Life Health FHIR Server
+Utilizamos o servidor [Life Health FHIR Server](https://github.com/luciana-pereira/life-health-fhir-server), com o bjetivo de padronizar, auxiliar e facilitar o uso dos dados de saude para o monitoramento e gestão da saude e bem estar dos nossos usuarios com sua previa autorização.
 
 ### Firebase
 Está ferramento foi utilizada para autenticação de usuários, embora o Firebase não ofereça suporte direto ao FHIR Server, usamos o Firebase como um serviço de backend para o aplicativo e integrá-lo com um FHIR Server para armazenamento e recuperação de dados de saúde.</br></br>
