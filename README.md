@@ -21,7 +21,7 @@ O App possibilita tambem o profissional da saude alem de ver como anda seu pacie
 
 <div align="center">
   <a href="">
-    <img width="655" alt="App LifeHealth mobile" src="https://github.com/luciana-pereira/life-health-mobile/assets/37550557/45c92afa-4a05-4b8a-97d7-29dbd825abee">
+    <img width="655" alt="App LifeHealth mobile" src="https://github.com/luciana-pereira/life-health-mobile/assets/37550557/e6f910f8-bb75-44be-9161-d2642c672989">
   </a>
 </div>
 
