@@ -55,7 +55,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="32dp"
-                    android:background="@drawable/white_radius"
+                    android:background="@drawable/white_top_buttons"
                     android:padding="2dp"
                     android:src="@drawable/baseline_account_circle_24"
                     app:layout_constraintBottom_toBottomOf="@+id/imageGradient"
